@@ -35,15 +35,16 @@ public class JiraService {
 
   public JiraService(final Site jiraSite) {
     this.jiraSite = jiraSite;
+	
 
     final ConnectionPool CONNECTION_POOL = new ConnectionPool(5, 60, TimeUnit.SECONDS);
 
-    OkHttpClient httpClient = new OkHttpClient.Builder()
+    OkHttpClient httpClient = new OkHttpClient.Builder().ignoreSSLIssues()
         .connectTimeout(jiraSite.getTimeout(), TimeUnit.MILLISECONDS)
         .readTimeout(jiraSite.getReadTimeout(), TimeUnit.MILLISECONDS)
         .connectionPool(CONNECTION_POOL)
         .retryOnConnectionFailure(true).addInterceptor(new SigningInterceptor(jiraSite)).build();
-
+		
     final ObjectMapper mapper = new ObjectMapper();
     mapper.registerModule(new JodaModule());
     this.jiraEndPoints = new Retrofit.Builder().baseUrl(this.jiraSite.getUrl().toString())
